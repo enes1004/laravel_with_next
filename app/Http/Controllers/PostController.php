@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -14,18 +15,18 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        return Post::all();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    // /**
+    //  * Show the form for creating a new resource.
+    //  *
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function create()
+    // {
+    //     //
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -35,7 +36,9 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $post=new Post;
+        $post->user()->associate(auth()->user());
+        return $this->update($request,$post);
     }
 
     /**
@@ -46,19 +49,19 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return $post;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Post $post)
-    {
-        //
-    }
+    // /**
+    //  * Show the form for editing the specified resource.
+    //  *
+    //  * @param  \App\Models\Post  $post
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function edit(Post $post)
+    // {
+    //     //
+    // }
 
     /**
      * Update the specified resource in storage.
@@ -69,7 +72,11 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        //
+        collect($request->only(["title","content"]))->map(function($item,$key) use ($post){
+            $post->$key=$item;
+        });
+        $post->save();
+        return $post;
     }
 
     /**
@@ -80,6 +87,6 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
     }
 }
