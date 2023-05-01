@@ -23,7 +23,11 @@ const BodyBg=styled.div`
   background-color: ${props=>props?.theme?.bg?.primary};
 `;
 
-export default function Layout({ children, home,className }) {
+interface LayoutProps{
+  children:JSX.Element,home:boolean,className:string
+}
+
+export default function Layout({ children, home,className }:LayoutProps): JSX.Element {
   return (
   <BodyBg>
     <GlobalStyle/>

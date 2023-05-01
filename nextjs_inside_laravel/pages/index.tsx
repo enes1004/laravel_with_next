@@ -3,10 +3,11 @@ import Layout, { siteTitle } from '../components/layout';
 import Date from '../components/date';
 import utilStyles from '../styles/utils.module.css';
 
-import { getAllPostsData, getSortedPostsDataForStatic } from '../lib/post';
+import { getAllPostsData } from '../lib/post';
 import Link from 'next/link';
+import { AppProps } from 'next/app';
 
-export async function getStaticProps(context) {
+export async function getStaticProps():Promise<{props:{data:Object}}> {
   console.log("get again getSortedPostsDataForStatic");
   const allPostsData = await getAllPostsData();
   const data=JSON.parse(JSON.stringify(allPostsData));;
@@ -17,7 +18,7 @@ export async function getStaticProps(context) {
   };
 }
 
-export default function Home({ data,context }) {
+export default function Home({ data }) {
   return (
     <Layout home>
       <Head>
