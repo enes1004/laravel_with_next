@@ -7,16 +7,18 @@ import Input from '@/components/Input'
 import InputError from '@/components/InputError'
 import Label from '@/components/Label'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/auth'
+import { useAuth,serverAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter, withRouter } from 'next/router'
+import { withIronSessionSsr } from 'iron-session/next';
+import { ironOptions } from '@/lib/iron_config';
 
-const Login = () => {
+const Login = ({last_page}) => {
     const router = useRouter()
 
     const { login } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: -1,
+        redirectIfAuthenticated: last_page??'/dashboard',
     })
 
     const [email, setEmail] = useState('')
@@ -129,5 +131,26 @@ const Login = () => {
         </GuestLayout>
     )
 }
+
+export const getServerSideProps =withIronSessionSsr(
+    async function getServerSideProps({req}){
+        const last_page=req.cookies?.last_page??null;
+        await serverAuth({request:req,session:req.session});
+        if(req.session.user && last_page){
+            return {
+                redirect:{
+                    destination:last_page,
+                    permanent:false
+                }
+            }
+        }
+        console.log(req.session.user);
+        console.log(last_page);
+        return {
+            props:{last_page}
+        }
+    },ironOptions
+)
+
 
 export default Login
