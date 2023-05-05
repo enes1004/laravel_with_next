@@ -1,5 +1,3 @@
-
-
 interface UserData extends Timestamps{
     id: number;
     email: string;
@@ -8,9 +6,9 @@ interface UserData extends Timestamps{
 }
 
 interface PostData extends Timestamps{
-    id: number;
+    id: any;
     content: string;
     title: string;
     user_id: number;
-    user: UserData;
+    user?: UserData;
 }

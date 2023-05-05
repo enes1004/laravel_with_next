@@ -1,5 +1,5 @@
 import Layout from '@/components/layout';
-import { getAllPostIds, getPostData,getPostDataForCaching,getAllPostIdsForCaching } from '../../lib/post';
+import { getAllPostIds, getPostData} from '../../lib/post';
 import Head from 'next/head';
 import Date from '@/components/date';
 import utilStyles from '@/styles/utils.module.css';
@@ -10,9 +10,9 @@ import utilStyles from '@/styles/utils.module.css';
 // }
 
 export default function Post({ postData }:{postData:PostData}) {
-  return <Layout>
+  return <Layout prev="/post/">
       <Head>
-        <title>{postData?.title + " / " + postData?.slug}</title>
+        <title>{postData?.title }</title>
       </Head>
       <h1 className={utilStyles.headingXl}>{postData?.title}</h1>
       <div className={utilStyles.lightText}>

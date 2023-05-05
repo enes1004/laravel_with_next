@@ -4,14 +4,10 @@ import styles from './layout.module.css';
 import utilStyles from '../styles/utils.module.css';
 import styled, { createGlobalStyle } from 'styled-components';
 import Link from 'next/link';
-
+import { useAuth } from '@/hooks/auth'
+import AppLayout from '@/components/Layouts/AppLayout';
+import GuestLayout from '@/components/Layouts/GuestLayout';
 const GlobalStyle = createGlobalStyle`
-  a{
-    ${props=>props?.theme?.link}
-  }
-  h1,h2,h3,h4,h5,h6,p,span,div{
-    color:${props=>props?.theme?.color?.primary}
-  }
 `
 
 const name = 'Enes';
@@ -24,13 +20,16 @@ const BodyBg=styled.div`
 `;
 
 interface LayoutProps{
-  children:JSX.Element,home:boolean,className:string
+  children:JSX.Element|Array<JSX.Element>,home?:boolean,className?:string,prev?:string,
 }
 
-export default function Layout({ children, home,className }:LayoutProps): JSX.Element {
+export default function Layout({ children, home,className,prev }:LayoutProps): JSX.Element {
+  const { user } = useAuth({ middleware: false })
+  const AuthLayout = user?AppLayout:GuestLayout;
   return (
   <BodyBg>
     <GlobalStyle/>
+    <AuthLayout>
     <LayoutBg className={`${styles.container} ${className}` }>
       <Head>
         <link rel="icon" href="/favicon.ico" />
@@ -60,33 +59,20 @@ export default function Layout({ children, home,className }:LayoutProps): JSX.El
             />
             <h1 className={utilStyles.heading2Xl}>{name}</h1>
           </>
-        ) : (
-          <>
-            <Link href="/">
-              <Image
-                priority
-                src="/images/profile.jpg"
-                className={utilStyles.borderCircle}
-                height={108}
-                width={108}
-                alt=""
-              />
-            </Link>
-            <h2 className={utilStyles.headingLg}>
-              <Link href="/" className={utilStyles.colorInherit}>
-                {name}
-              </Link>
-            </h2>
-          </>
-        )}
+        ) : null}
       </header>
       <main>{children}</main>
       {!home && (
         <div className={styles.backToHome}>
+        {prev?
+          <Link href={prev}>← Back</Link>
+        :
           <Link href="/">← Back to home</Link>
+        }
         </div>
       )}
     </LayoutBg>
+    </AuthLayout>
   </BodyBg>
   );
 };
