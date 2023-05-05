@@ -5,13 +5,14 @@ import { NextRequest } from 'next/server'
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-    const user=await serverAuth({request});
-    // const response= NextResponse.next();
-    console.log('user',user);
-    // return response;
-    if(await user) return NextResponse.next();
-    return NextResponse.next();
-    // return NextResponse.redirect(new URL('/login', request.url))
+    const is_auth=await serverAuth({request});
+
+    if(await is_auth) {
+        const response=NextResponse.next();
+        response.cookies.set('authenticated',Date.now().toString());
+        return response
+    }
+    return NextResponse.redirect(new URL('/login', request.url))
 }
 
 // See "Matching Paths" below to learn more
