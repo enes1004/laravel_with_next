@@ -15,6 +15,34 @@ interface ServerAuthParams extends AuthParams{
 }
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
+// const csrfForServer = async () => {
+//     const res=await fetch(api_path+'/sanctum/csrf-cookie').then((res)=>res.headers.get('set-cookie')?.split(";").find(i=>i.match(/^XSRF-TOKEN=/))?.replace(/^XSRF-TOKEN=/,''));
+//     return decodeURIComponent(res)
+
+// }
+
+export const serverAuth = async ({ middleware, redirectIfAuthenticated,request }:ServerAuthParams) => {
+
+
+
+
+    // if(!await csrf){return{user:null}};
+    const laravel_session=request.cookies.get('laravel_session')?.value;
+    const res = fetch(api_path+'/api/user',
+        {
+        credentials: "include",
+        headers:{
+            // 'X-XSRF-TOKEN':await csrf,
+           'Accept':'application/json',
+           Cookie: (laravel_session? (`laravel_session=${laravel_session};`) : ''),
+           referer: request.headers.get('referer') ?? 'http://localhost:3000',
+        }
+        }
+         )
+         .then(res=>{console.log("res",res);return res;})
+    const user=await res.ok?res.json():null;
+    return user
+}
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {}) => {
     const router = useRouter()
