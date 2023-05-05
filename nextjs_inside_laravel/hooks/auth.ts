@@ -7,7 +7,7 @@ import { Url } from 'url';
 
 interface AuthParams{
     middleware?:string|false;
-    redirectIfAuthenticated?:Url;
+    redirectIfAuthenticated?:Url|-1;
 }
 
 interface ServerAuthParams extends AuthParams{
@@ -15,22 +15,18 @@ interface ServerAuthParams extends AuthParams{
 }
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
-// const csrfForServer = async () => {
-//     const res=await fetch(api_path+'/sanctum/csrf-cookie').then((res)=>res.headers.get('set-cookie')?.split(";").find(i=>i.match(/^XSRF-TOKEN=/))?.replace(/^XSRF-TOKEN=/,''));
-//     return decodeURIComponent(res)
-
-// }
-
 export const serverAuth = async ({ middleware, redirectIfAuthenticated,request }:ServerAuthParams) => {
 
 
-
-
-    // if(!await csrf){return{user:null}};
     const laravel_session=request.cookies.get('laravel_session')?.value;
+    const auth_cookie=request.cookies.get('authenticated')?.value;
+    if(!laravel_session)return false;
+    if(auth_cookie) return true;
+
     const res = fetch(api_path+'/api/user',
         {
         credentials: "include",
+        keepalive: false,
         headers:{
             // 'X-XSRF-TOKEN':await csrf,
            'Accept':'application/json',
@@ -39,13 +35,21 @@ export const serverAuth = async ({ middleware, redirectIfAuthenticated,request }
         }
         }
          )
-         .then(res=>{console.log("res",res);return res;})
-    const user=await res.ok?res.json():null;
-    return user
+         .then(res=>{
+            console.log("res",res);
+         return res;})
+    return (await res).ok
 }
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {}) => {
     const router = useRouter()
+
+    const handleRedirectIfAuthenticated = ()=>{
+        if(redirectIfAuthenticated===-1){
+            router.back();return;
+        }
+        router.push(redirectIfAuthenticated??'')
+    }
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
         axios
@@ -141,12 +145,12 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {})
 
     useEffect(() => {
         if (middleware === 'guest' && redirectIfAuthenticated && user)
-            router.push(redirectIfAuthenticated??'')
+            handleRedirectIfAuthenticated()
         if (
             window.location.pathname === '/verify-email' &&
             user?.email_verified_at
         )
-            router.push(redirectIfAuthenticated??'')
+             handleRedirectIfAuthenticated()
         if (middleware === 'auth' && error) logout()
     }, [user, error])
 
