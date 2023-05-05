@@ -7,6 +7,8 @@ import { getIronSession } from "iron-session/edge";
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
     const response=NextResponse.next();
+    console.log(process.env.BUILDTIME);
+    if(process.env.BUILDTIME){return response;}
     const redirect_res=NextResponse.redirect(new URL('/login', request.url));
     const session = await getIronSession(request, response,ironOptions);
     console.log('session',session);
