@@ -1,6 +1,6 @@
 import useSWR from 'swr'
 import axios from '@/lib/axios'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextRequest } from 'next/server';
 import { Url } from 'url';
@@ -19,6 +19,12 @@ interface ServerAuthParams{
     }
     session:IronSession
 }
+
+interface MiddlewareAuthParams{
+    request:NextRequest;
+    session:IronSession
+}
+
 
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -55,10 +61,10 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {})
     const router = useRouter()
 
     const handleRedirectIfAuthenticated = ()=>{
-        if(redirectIfAuthenticated===-1){
-            router.back();return;
-        }
-        router.push(redirectIfAuthenticated??'')
+        // if(redirectIfAuthenticated){
+        // router.push(redirectIfAuthenticated??'')
+        // }
+        router.reload();
     }
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>

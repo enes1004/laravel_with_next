@@ -133,10 +133,21 @@ const Login = ({last_page}) => {
 }
 
 export const getServerSideProps =withIronSessionSsr(
-    async function getServerSideProps({req}){
-        const last_page=req.cookies?.last_page??null;
-        await serverAuth({request:req,session:req.session});
-        if(req.session.user && last_page){
+    async function getServerSideProps({req,res}){
+        if(process.env.BUILDTIME){return{props:{}}};
+
+        const last_page=req.cookies?.last_page??'/dashboard';
+
+        const session=req.session;
+        const laravel_session=req.cookies.laravel_session;
+        if(!laravel_session){
+            session.destroy();
+        }
+        if(!session?.user){
+            await serverAuth({request:req,session})
+        }
+        if(session.user?.id && !!laravel_session){
+
             return {
                 redirect:{
                     destination:last_page,
@@ -144,8 +155,6 @@ export const getServerSideProps =withIronSessionSsr(
                 }
             }
         }
-        console.log(req.session.user);
-        console.log(last_page);
         return {
             props:{last_page}
         }
