@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PostController;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,3 +21,13 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::resource("post",PostController::class);
+Route::group(["prefix"=>"auth"],function(){
+    Route::get('post/{post?}',function(Post $post=null){
+        if(!$post){ 
+            return ["ok"=>true];
+        }
+        if($post->id<10){return ["ok"=>false,"reason"=>"old content only viewable to admin"];}
+        return ["ok"=>true];
+    });
+});
+

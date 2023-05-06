@@ -7,20 +7,22 @@ import { IronSession } from 'iron-session';
 
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
-    var response=NextResponse.next();
+    var next=NextResponse.next();
 
-    if(process.env.BUILDTIME){return response;}
+    if(process.env.BUILDTIME){return next;}
 
-    const session = await getIronSession(request, response,ironOptions);
+    const session = await getIronSession(request, next,ironOptions);
 
-    response=await ensureHasLaravelSession({session,request,next:response});
+    var {next,terminate}=await ensureHasLaravelSession({session,request,next});
 
     if(request.url.match("/logout")){
         const redirect_res=redirectToLoginWithLastPage({request});
-        return await handleCookiesForLogout({session,request,next:redirect_res});
+        return (await handleCookiesForLogout({session,request,next:redirect_res.next})).next;
     }
-
-    return authenticateBySession({session,request,next:response});
+    var {next,terminate}=authenticateBySession({session,request,next});
+    if(terminate)return next;
+    var {next,terminate}= await authorizeBySession({session,request,next});
+    return next;
 }
 
 // See "Matching Paths" below to learn more
@@ -37,32 +39,50 @@ interface PartialMiddlewareParams{
     next:NextResponse
 }
 
-export function redirectToLoginWithLastPage({request}:{request:NextRequest}){
+interface MiddlewareResponse{
+    next:NextResponse,
+    terminate?:boolean
+}
+
+
+export function redirectToLoginWithLastPage({request}:{request:NextRequest}):MiddlewareResponse{
     const redirect_res=NextResponse.redirect(new URL('/login', request.url));
-    redirect_res.cookies.set('last_page',new URL(request.url).pathname);
+    redirect_res.cookies.set('last_page',request.nextUrl.pathname);
     redirect_res.headers.set('x-middleware-cache', 'no-cache') // Disables middleware caching
-    return redirect_res;
+    return {next:redirect_res,terminate:true};
 }
 
-export function authenticateBySession({session,request,next}:PartialMiddlewareParams) {
+export function authenticateBySession({session,request,next}:PartialMiddlewareParams):MiddlewareResponse {
     if(session.user){
-        return next;
+        return {next};
     }
-    return redirectToLoginWithLastPage({request})
+    return redirectToLoginWithLastPage({request});
 }
 
-export async function ensureHasLaravelSession({request,session,next}:PartialMiddlewareParams){
+export async function authorizeBySession({session,request,next}:PartialMiddlewareParams):Promise<MiddlewareResponse>{
+    const url=request.nextUrl.pathname;
+    if(session.auth?.includes(url)){
+        return {next};
+    }
+    const auth_response= await (await fetch(new URL('/api/auth'+url,request.url),{headers:{Accept:'application/json'}}).then(res=>res)).json()
+    const redirect_res=NextResponse.redirect(new URL('/auth'+url, request.url));
+    redirect_res.headers.set('x-middleware-cache', 'no-cache') // Disables middleware caching
+    return {next:redirect_res,terminate:true};
+
+}
+
+export async function ensureHasLaravelSession({request,session,next}:PartialMiddlewareParams):Promise<MiddlewareResponse>{
     const laravel_session=request.cookies.get('laravel_session')?.value;
     if(!laravel_session){
         await session.destroy();
-        return redirectToLoginWithLastPage({request});
+        return redirectToLoginWithLastPage({request})
     }
-    return next;
+    return {next};
 }
 
-export async function handleCookiesForLogout({session,next}:PartialMiddlewareParams){
+export async function handleCookiesForLogout({session,next}:PartialMiddlewareParams):Promise<MiddlewareResponse>{
     await session.destroy();
     next.cookies.delete('last_page');
     next.cookies.delete('laravel_session');
-    return next
+    return {next}
 }

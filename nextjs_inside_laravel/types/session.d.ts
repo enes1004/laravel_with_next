@@ -1,5 +1,6 @@
 declare module "iron-session" {
     interface IronSessionData {
+      auth?:Array<String>,
       user?: {
         id: number;
       } | null;

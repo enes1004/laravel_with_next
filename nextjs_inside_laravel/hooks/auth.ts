@@ -2,29 +2,7 @@ import useSWR from 'swr'
 import axios from '@/lib/axios'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { NextRequest } from 'next/server';
-import { Url } from 'url';
-import { IncomingMessage } from 'http';
-import { IronSessionData,IronSession } from 'iron-session';
-interface AuthParams{
-    middleware?:string|false;
-    redirectIfAuthenticated?:Url|-1;
-}
-
-interface ServerAuthParams{
-    request:IncomingMessage & {
-        cookies: Partial<{
-            [key: string]: string;
-        }>
-    }
-    session:IronSession
-}
-
-interface MiddlewareAuthParams{
-    request:NextRequest;
-    session:IronSession
-}
-
+import { AuthParams, AuthorizationFeedback, ServerAuthParams, ServerAuthorizeParams } from '@/types/auth';
 
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -55,6 +33,38 @@ export const serverAuth = async ({request,session }:ServerAuthParams) => {
         session.user=null;
     }
     await session.save();   
+}
+
+export const serverAuthorize = async ({request,session,pathParams }:ServerAuthorizeParams):Promise<AuthorizationFeedback> => {
+
+    // const laravel_session=request.cookies.get('laravel_session')?.value;
+    const path='/'+(Array.isArray(pathParams)?pathParams:[pathParams]).join('/');
+    if(session?.auth?.includes(path)){
+       return {ok:true};
+    }
+    const laravel_session=request.cookies?.laravel_session;
+    const res = await fetch(api_path+'/api/auth'+path,
+        {
+        credentials: "include",
+        keepalive: false,
+        headers:{
+            // 'X-XSRF-TOKEN':await csrf,
+           'Accept':'application/json',
+           Cookie: (laravel_session? (`laravel_session=${laravel_session};`) : ''),
+           referer: request.headers?.referer ?? 'http://localhost:3000',
+        }
+        }
+         )
+         .then(res=>{return res;})
+             
+    const auth_response=await res.json()
+
+    if(auth_response.ok){
+        if(!session.auth){session.auth=[];}
+        session.auth.push(path);
+        await session.save();   
+    }
+    return auth_response;
 }
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {}) => {
