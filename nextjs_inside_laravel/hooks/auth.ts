@@ -1,29 +1,39 @@
 import useSWR from 'swr'
 import axios from '@/lib/axios'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextRequest } from 'next/server';
 import { Url } from 'url';
-
+import { IncomingMessage } from 'http';
+import { IronSessionData,IronSession } from 'iron-session';
 interface AuthParams{
     middleware?:string|false;
     redirectIfAuthenticated?:Url|-1;
 }
 
-interface ServerAuthParams extends AuthParams{
-    request:NextRequest
+interface ServerAuthParams{
+    request:IncomingMessage & {
+        cookies: Partial<{
+            [key: string]: string;
+        }>
+    }
+    session:IronSession
 }
+
+interface MiddlewareAuthParams{
+    request:NextRequest;
+    session:IronSession
+}
+
+
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export const serverAuth = async ({ middleware, redirectIfAuthenticated,request }:ServerAuthParams) => {
+export const serverAuth = async ({request,session }:ServerAuthParams) => {
 
-
-    const laravel_session=request.cookies.get('laravel_session')?.value;
-    const auth_cookie=request.cookies.get('authenticated')?.value;
-    if(!laravel_session)return false;
-    if(auth_cookie) return true;
-
-    const res = fetch(api_path+'/api/user',
+    // const laravel_session=request.cookies.get('laravel_session')?.value;
+    const laravel_session=request.cookies?.laravel_session;
+    if(!laravel_session){await session.destroy();return false;}
+    const res = await fetch(api_path+'/api/user',
         {
         credentials: "include",
         keepalive: false,
@@ -31,24 +41,30 @@ export const serverAuth = async ({ middleware, redirectIfAuthenticated,request }
             // 'X-XSRF-TOKEN':await csrf,
            'Accept':'application/json',
            Cookie: (laravel_session? (`laravel_session=${laravel_session};`) : ''),
-           referer: request.headers.get('referer') ?? 'http://localhost:3000',
+           referer: request.headers?.referer ?? 'http://localhost:3000',
         }
         }
          )
-         .then(res=>{
-            console.log("res",res);
-         return res;})
-    return (await res).ok
+         .then(res=>{return res;})
+             
+    const user=await res.json()
+
+    if(res.ok && user){
+        session.user=user;
+    }else{
+        session.user=null;
+    }
+    await session.save();   
 }
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {}) => {
     const router = useRouter()
 
     const handleRedirectIfAuthenticated = ()=>{
-        if(redirectIfAuthenticated===-1){
-            router.back();return;
-        }
-        router.push(redirectIfAuthenticated??'')
+        // if(redirectIfAuthenticated){
+        // router.push(redirectIfAuthenticated??'')
+        // }
+        router.reload();
     }
 
     const { data: user, error, mutate } = useSWR('/api/user', () =>
@@ -136,11 +152,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {})
     }
 
     const logout = async () => {
-        if (! error) {
-            await axios.post('/logout').then(() => mutate())
-        }
-
-        window.location.pathname = '/login'
+        window.location.pathname= '/logout';
     }
 
     useEffect(() => {

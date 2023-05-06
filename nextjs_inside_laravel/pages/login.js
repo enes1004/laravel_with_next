@@ -7,16 +7,18 @@ import Input from '@/components/Input'
 import InputError from '@/components/InputError'
 import Label from '@/components/Label'
 import Link from 'next/link'
-import { useAuth } from '@/hooks/auth'
+import { useAuth,serverAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import { useRouter, withRouter } from 'next/router'
+import { withIronSessionSsr } from 'iron-session/next';
+import { ironOptions } from '@/lib/iron_config';
 
-const Login = () => {
+const Login = ({last_page}) => {
     const router = useRouter()
 
     const { login } = useAuth({
         middleware: 'guest',
-        redirectIfAuthenticated: -1,
+        redirectIfAuthenticated: last_page??'/dashboard',
     })
 
     const [email, setEmail] = useState('')
@@ -129,5 +131,35 @@ const Login = () => {
         </GuestLayout>
     )
 }
+
+export const getServerSideProps =withIronSessionSsr(
+    async function getServerSideProps({req,res}){
+        if(process.env.BUILDTIME){return{props:{}}};
+
+        const last_page=req.cookies?.last_page??'/dashboard';
+
+        const session=req.session;
+        const laravel_session=req.cookies.laravel_session;
+        if(!laravel_session){
+            session.destroy();
+        }
+        if(!session?.user){
+            await serverAuth({request:req,session})
+        }
+        if(session.user?.id && !!laravel_session){
+
+            return {
+                redirect:{
+                    destination:last_page,
+                    permanent:false
+                }
+            }
+        }
+        return {
+            props:{last_page}
+        }
+    },ironOptions
+)
+
 
 export default Login

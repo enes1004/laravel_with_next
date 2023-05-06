@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "BUILDTIME=1 next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -25,6 +25,7 @@
     "eslint-config-next": "13.3.2",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prettier": "^3.3.0",
+    "iron-session": "^6.3.1",
     "next": "13.3.2",
     "postcss": "8.4.23",
     "prettier": "2.2.1",
