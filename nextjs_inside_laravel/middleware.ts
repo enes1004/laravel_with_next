@@ -64,8 +64,8 @@ export async function authorizeBySession({session,request,next}:PartialMiddlewar
     if(session.auth?.includes(url)){
         return {next};
     }
-    const auth_response= await (await fetch(new URL('/api/auth'+url,request.url),{headers:{Accept:'application/json'}}).then(res=>res)).json()
-    const redirect_res=NextResponse.redirect(new URL('/auth'+url, request.url));
+    const auth_response= await (await fetch(new URL('/api/authorize'+url,request.url),{headers:{Accept:'application/json'}}).then(res=>res)).json()
+    const redirect_res=NextResponse.redirect(new URL('/authorize'+url, request.url));
     redirect_res.headers.set('x-middleware-cache', 'no-cache') // Disables middleware caching
     return {next:redirect_res,terminate:true};
 
