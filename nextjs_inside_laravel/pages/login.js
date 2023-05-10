@@ -7,7 +7,7 @@ import Input from '@/components/Input'
 import InputError from '@/components/InputError'
 import Label from '@/components/Label'
 import Link from 'next/link'
-import { useAuth,serverAuth } from '@/hooks/auth'
+import { useAuth,serverAuthenticate } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
 import { useRouter, withRouter } from 'next/router'
 import { withIronSessionSsr } from 'iron-session/next';
@@ -144,7 +144,7 @@ export const getServerSideProps =withIronSessionSsr(
             session.destroy();
         }
         if(!session?.user){
-            await serverAuth({request:req,session})
+            await serverAuthenticate({request:req,session})
         }
         if(session.user?.id && !!laravel_session){
 

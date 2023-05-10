@@ -6,7 +6,7 @@ import { AuthParams, AuthorizationFeedback, ServerAuthParams, ServerAuthorizePar
 
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
-export const serverAuth = async ({request,session }:ServerAuthParams) => {
+export const serverAuthenticate = async ({request,session }:ServerAuthParams) => {
 
     // const laravel_session=request.cookies.get('laravel_session')?.value;
     const laravel_session=request.cookies?.laravel_session;
