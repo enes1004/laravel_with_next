@@ -1,3 +1,4 @@
+"use client";
 import Navigation from '@/components/Layouts/Navigation'
 import { useAuth } from '@/hooks/auth'
 

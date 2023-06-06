@@ -7,15 +7,16 @@ import Input from '@/components/Input'
 import InputError from '@/components/InputError'
 import Label from '@/components/Label'
 import Link from 'next/link'
-import { useAuth,serverAuthenticate } from '@/hooks/auth'
+import { useAuth } from '@/hooks/auth'
+import { serverAuthenticate } from '@/hooks/server_auth'
 import { useEffect, useState } from 'react'
-import { useRouter, withRouter } from 'next/router'
+import { useRouter, useSearchParams, withRouter } from 'next/navigation'
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '@/lib/iron_config';
 
 const Login = ({last_page}) => {
     const router = useRouter()
-
+    const query= useSearchParams();
     const { login } = useAuth({
         middleware: 'guest',
         redirectIfAuthenticated: last_page??'/dashboard',
@@ -28,8 +29,9 @@ const Login = ({last_page}) => {
     const [status, setStatus] = useState(null)
 
     useEffect(() => {
-        if (router.query.reset?.length > 0 && errors.length === 0) {
-            setStatus(atob(router.query.reset))
+        const reset=query.get('reset');
+        if (reset?.length > 0 && errors.length === 0) {
+            setStatus(atob(reset))
         } else {
             setStatus(null)
         }

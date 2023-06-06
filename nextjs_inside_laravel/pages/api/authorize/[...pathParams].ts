@@ -1,4 +1,4 @@
-import { serverAuthorize } from '@/hooks/auth';
+import { serverAuthorize } from '@/hooks/server_auth';
 import { ironOptions } from '@/lib/iron_config';
 import { ParamsWithPath } from '@/types/auth';
 import { withIronSessionApiRoute } from 'iron-session/next';
