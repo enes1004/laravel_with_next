@@ -1,4 +1,3 @@
-import Layout from '@/components/layout';
 import { getAllPostIds, getPostData} from '@/lib/post';
 import Head from 'next/head';
 import Date from '@/components/date';
@@ -10,11 +9,11 @@ import { Metadata } from 'next';
 //   return {props:{}};
 // }
 
-export async function generateMetadata({ params }:{params:{id:number}}) {
-    return {
-      title: params.title,
-    };
-  }
+// export async function generateMetadata({ params }:{params:{id:number}}) {
+//     return {
+//       title: params.title,
+//     };
+//   }
 export async function generateStaticParams() {
    const paths = await getAllPostIds();
  
@@ -23,10 +22,7 @@ export async function generateStaticParams() {
 
 export default async function Post({params}:{params:{id:number}}) {
     const postData = await getPostData(params.id);
-    return <Layout prev="/post/">
-      <Head>
-        <title>{postData?.title }</title>
-      </Head>
+    return <> 
       <h1 className={utilStyles.headingXl}>{postData?.title}</h1>
       <div className={utilStyles.lightText}>
         By {(postData?.user?.name)??"Anonymous"}
@@ -35,7 +31,7 @@ export default async function Post({params}:{params:{id:number}}) {
         {/* {postData?<Date dateString={postData.created_at} />:null} */}
       </div>
       <div dangerouslySetInnerHTML={{ __html: postData?.content }} />
-  </Layout>;
+  </>;
 }
 
 // export async function getServerSideProps({ params,req,res }) {

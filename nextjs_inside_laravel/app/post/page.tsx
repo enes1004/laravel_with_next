@@ -1,4 +1,3 @@
-import Layout, { siteTitle } from '@/components/layout';
 import Date from '@/components/date';
 import utilStyles from '@/styles/utils.module.css';
 
@@ -9,7 +8,7 @@ import { AppProps } from 'next/app';
 export default async function Home() {
     const data = await getAllPostsData();
     return (
-    <Layout home>
+      <>
       <section className={utilStyles.headingMd}>
         <p>Lorem Ipsum tests preview function on vercel</p>
         <p>
@@ -37,6 +36,6 @@ export default async function Home() {
          ))}
        </ul>
      </section>
-    </Layout>
+    </>
   );
 }
