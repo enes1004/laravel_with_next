@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Date from '@/components/date';
 import utilStyles from '@/styles/utils.module.css';
 import { Metadata } from 'next';
-
+import MyDiv from '@/components/MyDiv';
 // export async function getServerSideProps(info){
 //   console.log(info);
 //   return {props:{}};
@@ -24,9 +24,9 @@ export default async function Post({params}:{params:{id:number}}) {
     const postData = await getPostData(params.id);
     return <> 
       <h1 className={utilStyles.headingXl}>{postData?.title}</h1>
-      <div className={utilStyles.lightText}>
+      <MyDiv className={utilStyles.lightText}>
         By {(postData?.user?.name)??"Anonymous"}
-      </div>
+      </MyDiv>
       <div className={utilStyles.lightText}>
         {/* {postData?<Date dateString={postData.created_at} />:null} */}
       </div>
