@@ -1,14 +1,14 @@
-"use client";
 import useSWR from 'swr'
 import axios from '@/lib/axios'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { AuthParams } from '@/types/auth';
 
 const api_path=process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {}) => {
     const router = useRouter()
+    const query = useSearchParams();
 
     const handleRedirectIfAuthenticated = ()=>{
         // if(redirectIfAuthenticated){
@@ -84,7 +84,7 @@ export const useAuth = ({ middleware, redirectIfAuthenticated }:AuthParams = {})
         setStatus(null)
 
         axios
-            .post('/reset-password', { token: router.query.token, ...props })
+            .post('/reset-password', { token: query?.get('token'), ...props })
             .then(response =>
                 router.push('/login?reset=' + btoa(response.data.status)),
             )
