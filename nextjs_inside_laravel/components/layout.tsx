@@ -8,7 +8,6 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/auth'
 import AppLayout from '@/components/Layouts/AppLayout';
 import AuthLayout from '@/components/Layouts/AuthLayout';
-import { Suspense } from 'react';
 
 const GlobalStyle = createGlobalStyle`
 `
@@ -30,7 +29,6 @@ export default function Layout({ children, home,className,prev }:LayoutProps): J
   return (
   <BodyBg>
     <GlobalStyle/>
-    <Suspense>
     <AuthLayout>
     <LayoutBg className={`${styles.container} ${className}` }>
       <Head>
@@ -75,7 +73,6 @@ export default function Layout({ children, home,className,prev }:LayoutProps): J
       )}
     </LayoutBg>
     </AuthLayout>
-    </Suspense>
   </BodyBg>
   );
 };

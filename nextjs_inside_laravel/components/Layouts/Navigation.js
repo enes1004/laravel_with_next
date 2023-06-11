@@ -11,7 +11,9 @@ import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-const Navigation = ({ user }) => {
+const Navigation = () => {
+    const { user } = useAuth({ middleware: 'auth' })
+
     const router = useRouter()
 
     const { logout } = useAuth()
