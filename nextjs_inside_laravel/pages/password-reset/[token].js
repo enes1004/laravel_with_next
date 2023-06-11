@@ -9,7 +9,7 @@ import Label from '@/components/Label'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 
 const PasswordReset = () => {
     const router = useRouter()

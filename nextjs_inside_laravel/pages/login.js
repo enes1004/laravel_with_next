@@ -10,13 +10,12 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/auth'
 import { serverAuthenticate } from '@/hooks/server_auth'
 import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams, withRouter } from 'next/navigation'
+import { useRouter } from 'next/router'
 import { withIronSessionSsr } from 'iron-session/next';
 import { ironOptions } from '@/lib/iron_config';
 
 const Login = ({last_page}) => {
     const router = useRouter()
-    const query= useSearchParams();
     const { login } = useAuth({
         middleware: 'guest',
         redirectIfAuthenticated: last_page??'/dashboard',
@@ -29,7 +28,7 @@ const Login = ({last_page}) => {
     const [status, setStatus] = useState(null)
 
     useEffect(() => {
-        const reset=query.get('reset');
+        const reset=router.query.reset;
         if (reset?.length > 0 && errors.length === 0) {
             setStatus(atob(reset))
         } else {
