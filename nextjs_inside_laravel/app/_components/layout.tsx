@@ -3,7 +3,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from './layout.module.css';
 import utilStyles from '../styles/utils.module.css';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from '@/components/styled-components';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth'
 import AppLayout from '@/components/Layouts/AppLayout';
