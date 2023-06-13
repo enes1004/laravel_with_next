@@ -1,3 +1,4 @@
+"use client";
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from './layout.module.css';
@@ -6,7 +7,8 @@ import styled, { createGlobalStyle } from 'styled-components';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth'
 import AppLayout from '@/components/Layouts/AppLayout';
-import GuestLayout from '@/components/Layouts/GuestLayout';
+import AuthLayout from '@/components/Layouts/AuthLayout';
+
 const GlobalStyle = createGlobalStyle`
 `
 
@@ -20,12 +22,10 @@ const BodyBg=styled.div`
 `;
 
 interface LayoutProps{
-  children:JSX.Element|Array<JSX.Element>,home?:boolean,className?:string,prev?:string,
+  children:JSX.Element|Array<JSX.Element>|React.ReactNode,home?:boolean,className?:string,prev?:string,
 }
 
 export default function Layout({ children, home,className,prev }:LayoutProps): JSX.Element {
-  const { user } = useAuth({ middleware: false })
-  const AuthLayout = user?AppLayout:GuestLayout;
   return (
   <BodyBg>
     <GlobalStyle/>

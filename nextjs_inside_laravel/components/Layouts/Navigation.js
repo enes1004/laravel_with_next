@@ -1,3 +1,4 @@
+"use client";
 import ApplicationLogo from '@/components/ApplicationLogo'
 import Dropdown from '@/components/Dropdown'
 import Link from 'next/link'
@@ -7,10 +8,12 @@ import ResponsiveNavLink, {
 } from '@/components/ResponsiveNavLink'
 import { DropdownButton } from '@/components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-const Navigation = ({ user }) => {
+const Navigation = () => {
+    const { user } = useAuth({ middleware: 'auth' })
+
     const router = useRouter()
 
     const { logout } = useAuth()

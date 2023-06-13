@@ -1,5 +1,3 @@
-import Head from 'next/head';
-import Layout, { siteTitle } from '@/components/layout';
 import Date from '@/components/date';
 import utilStyles from '@/styles/utils.module.css';
 
@@ -7,23 +5,10 @@ import { getAllPostsData } from '@/lib/post';
 import Link from 'next/link';
 import { AppProps } from 'next/app';
 
-export async function getStaticProps():Promise<{props:{data:Object}}> {
-  console.log("get again getSortedPostsDataForStatic");
-  const allPostsData = await getAllPostsData();
-  const data=JSON.parse(JSON.stringify(allPostsData));;
-  return {
-    props: {
-      data,
-    },
-  };
-}
-
-export default function Home({ data }:{data:Array<PostData>}) {
-  return (
-    <Layout home>
-      <Head>
-        <title>{siteTitle}</title>
-      </Head>
+export default async function Home() {
+    const data = await getAllPostsData();
+    return (
+      <>
       <section className={utilStyles.headingMd}>
         <p>Lorem Ipsum tests preview function on vercel</p>
         <p>
@@ -51,6 +36,6 @@ export default function Home({ data }:{data:Array<PostData>}) {
          ))}
        </ul>
      </section>
-    </Layout>
+    </>
   );
 }

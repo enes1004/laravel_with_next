@@ -1,5 +1,5 @@
 import Layout from '@/components/layout';
-import { serverAuthorize } from '@/hooks/auth';
+import { serverAuthorize } from '@/hooks/server_auth';
 import { ironOptions } from '@/lib/iron_config';
 import { withIronSessionSsr } from 'iron-session/next';
 import Head from 'next/head';
