@@ -1,4 +1,4 @@
-import Layout from "@/components/layout";
+import Layout from "@/app/_components/layout";
 
 const BlockedPage = () => (
     <Layout>

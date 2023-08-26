@@ -1,12 +1,12 @@
 "use client";
-import ApplicationLogo from '@/components/ApplicationLogo'
-import Dropdown from '@/components/Dropdown'
+import ApplicationLogo from '@/app/_components/ApplicationLogo'
+import Dropdown from '@/app/_components/Dropdown'
 import Link from 'next/link'
-import NavLink from '@/components/NavLink'
+import NavLink from '@/app/_components/NavLink'
 import ResponsiveNavLink, {
     ResponsiveNavButton,
-} from '@/components/ResponsiveNavLink'
-import { DropdownButton } from '@/components/DropdownLink'
+} from '@/app/_components/ResponsiveNavLink'
+import { DropdownButton } from '@/app/_components/DropdownLink'
 import { useAuth } from '@/hooks/auth'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'

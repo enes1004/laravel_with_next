@@ -1,5 +1,5 @@
 "use client";
-import Navigation from '@/components/Layouts/Navigation'
+import Navigation from '@/app/_components/Layouts/Navigation'
 import { useAuth } from '@/hooks/auth'
 import { Suspense } from 'react';
 

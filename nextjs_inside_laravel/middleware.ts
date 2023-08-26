@@ -8,6 +8,7 @@ import { IronSession } from 'iron-session';
 // This function can be marked `async` if using `await` inside
 export async function middleware(request: NextRequest) {
     var next=NextResponse.next();
+    return next;
 
     if(process.env.BUILDTIME){return next;}
 

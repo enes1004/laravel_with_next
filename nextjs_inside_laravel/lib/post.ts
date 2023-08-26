@@ -14,7 +14,7 @@ export async function getPostData(id: number): Promise<PostData> {
 export async function getAllPostIds():Promise< Array<{id:number} >> {
   const res= await fetch(api_path+"/api/post",{});
   const data=await res.json();
-  return data.map((one: PostData) => {
+  return [...data].slice(0,20).map((one: PostData) => {
     return {
         id: one.id.toString(),
       }

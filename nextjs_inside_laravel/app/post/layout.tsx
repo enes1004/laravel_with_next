@@ -1,4 +1,4 @@
-import Layout from '@/components/layout';
+import Layout from '@/app/_components/layout';
 
 export default function PageLayout({
     children,

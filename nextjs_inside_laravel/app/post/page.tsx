@@ -1,4 +1,4 @@
-import Date from '@/components/date';
+import Date from '@/app/_components/date';
 import utilStyles from '@/styles/utils.module.css';
 
 import { getAllPostsData } from '@/lib/post';

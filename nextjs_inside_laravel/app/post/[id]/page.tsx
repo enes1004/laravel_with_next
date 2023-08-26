@@ -1,9 +1,7 @@
 import { getAllPostIds, getPostData} from '@/lib/post';
-import Head from 'next/head';
-import Date from '@/components/date';
 import utilStyles from '@/styles/utils.module.css';
-import { Metadata } from 'next';
-import MyDiv from '@/components/MyDiv';
+import Link from 'next/link';
+import { useEffect } from 'react';
 // export async function getServerSideProps(info){
 //   console.log(info);
 //   return {props:{}};
@@ -15,18 +13,18 @@ import MyDiv from '@/components/MyDiv';
 //     };
 //   }
 export async function generateStaticParams() {
-   const paths = await getAllPostIds();
- 
+  const paths = await getAllPostIds();
   return paths;
 }
 
 export default async function Post({params}:{params:{id:number}}) {
-    const postData = await getPostData(params.id);
+    const postData= await fetch(`${process.env.NEXT_PUBLIC_LARAVEL_API}/api/post/${params.id}`).then(res=>res.json());
+    console.log('will rerender post');
     return <> 
       <h1 className={utilStyles.headingXl}>{postData?.title}</h1>
-      <MyDiv className={utilStyles.lightText}>
+      <div className={utilStyles.lightText}>
         By {(postData?.user?.name)??"Anonymous"}
-      </MyDiv>
+      </div>
       <div className={utilStyles.lightText}>
         {/* {postData?<Date dateString={postData.created_at} />:null} */}
       </div>

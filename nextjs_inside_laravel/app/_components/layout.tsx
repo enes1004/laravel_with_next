@@ -2,15 +2,13 @@
 import Head from 'next/head';
 import Image from 'next/image';
 import styles from './layout.module.css';
-import utilStyles from '../styles/utils.module.css';
-import styled, { createGlobalStyle } from '@/components/styled-components';
+import utilStyles from '@/styles/utils.module.css';
+import styled from 'styled-components';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/auth'
-import AppLayout from '@/components/Layouts/AppLayout';
-import AuthLayout from '@/components/Layouts/AuthLayout';
+import AppLayout from '@/app/_components/Layouts/AppLayout';
+import AuthLayout from '@/app/_components/Layouts/AuthLayout';
 
-const GlobalStyle = createGlobalStyle`
-`
 
 const name = 'Enes';
 export const siteTitle = 'Next.js Sample Website';
@@ -28,7 +26,6 @@ interface LayoutProps{
 export default function Layout({ children, home,className,prev }:LayoutProps): JSX.Element {
   return (
   <BodyBg>
-    <GlobalStyle/>
     <AuthLayout>
     <LayoutBg className={`${styles.container} ${className}` }>
       <Head>
